@@ -1,0 +1,5 @@
+com\camunda\neuantrag\cmmn\listener\CloseCaseInstanceListener.class
+com\camunda\neuantrag\cmmn\LoggerDelegate.class
+com\camunda\neuantrag\cmmn\CamundaBpmProcessApplication.class
+com\camunda\neuantrag\cmmn\listener\SignalProcessInstanceListener.class
+com\camunda\neuantrag\cmmn\listener\SignalProcessInstanceListener$MyOperationCaseTerminate.class

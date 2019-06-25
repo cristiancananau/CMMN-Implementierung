@@ -1,0 +1,63 @@
+<form class="form-horizontal">
+
+	    <div class="control-group">
+    <label class="control-label">Bitte schicken Sie dem Kunden diese Formular zu</label>
+    <div class="controls">
+      <input type="file"
+             id="formulare"
+             cam-variable-name="formulare"
+             cam-variable-type="File"
+             cam-max-filesize="10000000"
+             class="form-control"
+             accept=".jpg,.jpeg,.png,.pdf"
+             multiple="multiple"
+             />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Zur Simulation k&#246;nnen Sie hier direkt das Ergebnis der Vorerkrankung eintragen</label>
+    <div class="controls">
+      <input type="text" 
+             cam-variable-name="vorerkrankung"
+             cam-variable-type="String"
+             class="form-control" />      
+    </div>
+  </div>
+  
+  <script cam-script type="text/form-script">
+    debugger;
+
+	var inputList = [];
+	var input = document.getElementById("formulare");
+	input.addEventListener("change", function () {
+		for(var i = 0; i < this.files.length; i++) {
+        var myFile = this.files[i];
+        var reader = new FileReader();
+        reader.addEventListener('load', function (e) {
+          var binaryString = e.target.result;
+          var data = btoa(binaryString);
+          inputList.push(data);
+        });
+        reader.readAsBinaryString(myFile);
+    	}
+	});
+
+	var variableManager = camForm.variableManager;
+    camForm.on('submit', function(evt) {
+		var files = $('#formulare')[0].files;
+		for(var i = 1; i < files.length; i++) {
+			var varName = 'formulare'+i;
+			variableManager.createVariable({
+        		name: varName,
+        		type: 'File',
+       			value: inputList[i],
+     			valueInfo: {
+         			filename: files[i].name,
+					mimetype: files[i].type		 
+				}
+     		});
+		}
+    });
+
+  </script>
+</form>

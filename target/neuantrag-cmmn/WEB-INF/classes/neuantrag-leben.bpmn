@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.0.1">
+  <bpmn:process id="neuantrag-leben" name="Neuantrag Leben" isExecutable="true">
+    <bpmn:endEvent id="EndEventProcessEnded" name="Antrag&#10;angenommen">
+      <bpmn:incoming>SequenceFlow_0r3r9sa</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="Task_0x4ho3d" name="Neuantrags-prüfung" camunda:caseRef="neuantragspruefung-leben">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+        <camunda:out sourceExpression="#{execution.caseInstanceId}" target="completedCaseInstanceId" />
+        <camunda:executionListener class="com.camunda.neuantrag.cmmn.listener.CloseCaseInstanceListener" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1mp5cw8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1wk18n8</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1pn6b1j" name="Antrag angenommen?">
+      <bpmn:incoming>SequenceFlow_1wk18n8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0r3r9sa</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1kdl93q</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_0ugp4ky" name="Gegenangebot erstellen" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="counterProposal" label="Wählen Sie bitte ein Gegenangebot aus ?:" type="enum">
+            <camunda:value id="gegenangebot1" name="Gegenangebot 1" />
+            <camunda:value id="gegenangebot2" name="Gegenangebot 2" />
+            <camunda:value id="gegenangebot3" name="Gegenangebot 3" />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1kdl93q</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_084tg8a</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_0xnrzm6" name="Bonität prüfen" camunda:expression="#{true}">
+      <bpmn:incoming>SequenceFlow1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1mp5cw8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1mp5cw8" sourceRef="Task_0xnrzm6" targetRef="Task_0x4ho3d" />
+    <bpmn:sequenceFlow id="SequenceFlow_1kdl93q" name="Nein" sourceRef="ExclusiveGateway_1pn6b1j" targetRef="Task_0ugp4ky">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{ !approved }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0r3r9sa" name="Ja" sourceRef="ExclusiveGateway_1pn6b1j" targetRef="EndEventProcessEnded">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{ approved }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1wk18n8" sourceRef="Task_0x4ho3d" targetRef="ExclusiveGateway_1pn6b1j" />
+    <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="StartEventProcessStarted" targetRef="Task_0xnrzm6" />
+    <bpmn:startEvent id="StartEventProcessStarted" name="Antrag&#10;eingegangen" camunda:formKey="embedded:app:start-form.html">
+      <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_084tg8a" sourceRef="Task_0ugp4ky" targetRef="EndEvent_1kyt4hm" />
+    <bpmn:endEvent id="EndEvent_1kyt4hm" name="Angebot versendet">
+      <bpmn:incoming>SequenceFlow_084tg8a</bpmn:incoming>
+      <bpmn:messageEventDefinition camunda:expression="${ true }" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="neuantrag-leben">
+      <bpmndi:BPMNEdge id="SequenceFlow_1mp5cw8_di" bpmnElement="SequenceFlow_1mp5cw8">
+        <di:waypoint x="396" y="120" />
+        <di:waypoint x="474" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="435" y="105" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1kdl93q_di" bpmnElement="SequenceFlow_1kdl93q">
+        <di:waypoint x="650" y="145" />
+        <di:waypoint x="650" y="223" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="662" y="160" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0r3r9sa_di" bpmnElement="SequenceFlow_0r3r9sa">
+        <di:waypoint x="675" y="120" />
+        <di:waypoint x="859" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="675" y="97" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1wk18n8_di" bpmnElement="SequenceFlow_1wk18n8">
+        <di:waypoint x="574" y="120" />
+        <di:waypoint x="625" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="105" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_08va5r8_di" bpmnElement="SequenceFlow1">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="296" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="253" y="105" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEventProcessStarted">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="138" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fkea3f_di" bpmnElement="EndEventProcessEnded">
+        <dc:Bounds x="859" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="843" y="138" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_0v7o5ed_di" bpmnElement="Task_0x4ho3d">
+        <dc:Bounds x="474" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1pn6b1j_di" bpmnElement="ExclusiveGateway_1pn6b1j" isMarkerVisible="true">
+        <dc:Bounds x="625" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="613" y="62" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1xzh3hw_di" bpmnElement="Task_0ugp4ky">
+        <dc:Bounds x="600" y="223" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0wgci6b_di" bpmnElement="Task_0xnrzm6">
+        <dc:Bounds x="296" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_084tg8a_di" bpmnElement="SequenceFlow_084tg8a">
+        <di:waypoint x="700" y="263" />
+        <di:waypoint x="849" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_08pqfuf_di" bpmnElement="EndEvent_1kyt4hm">
+        <dc:Bounds x="849" y="245" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="843" y="288" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

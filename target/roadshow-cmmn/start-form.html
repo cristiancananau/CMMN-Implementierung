@@ -1,0 +1,97 @@
+<p>
+ Mit diesem Formular simulieren wir den Eingang eines neuen Antrags auf Lebensversicherung.</code>
+</p>
+
+<form class="form-horizontal">
+  <div class="control-group">
+    <label class="control-label">Name</label>
+    <div class="controls">
+      <input type="text" 
+             cam-variable-name="name"
+             cam-variable-type="String"
+             required
+             class="form-control" />
+    </div>
+    <div class="control-group">
+      <label class="control-label">Monatliche Rate</label>
+      <div class="controls">
+        <input type="text" 
+               cam-variable-name="rate"
+               cam-variable-type="Integer"
+               class="form-control" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Und noch mehr Infos...</label>
+      <div class="controls">
+        <textarea 
+               cam-variable-name="infos"
+               cam-variable-type="String"
+               class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Vorerkrankung</label>
+      <div class="controls">
+      	<select cam-variable-name="vorerkrankung" cam-variable-type="String" type="text" name="reviewer" class="form-control ng-pristine ng-untouched ng-valid-cam-variable-type ng-empty ng-invalid ng-invalid-required" required="" ng-model="vorerkrankung">
+	        <option value="" selected="selected"></option>
+	        <option value="Diabetis">Diabetis</option>
+	        <option value="Bluthochdruck">Bluthochdruck</option>
+	        <option value="Pankreatitis">Pankreatitis</option>
+	        <option value="Keine">Keine</option>
+      </select>
+      </div>
+    </div>
+    <div class="control-group">
+    <label class="control-label">Dokumente hochladen</label>
+    <div class="controls">
+      <input type="file"
+             id="documentUpload"
+             cam-variable-name="documentUpload"
+             cam-variable-type="File"
+             cam-max-filesize="10000000"
+             class="form-control"
+             accept=".jpg,.jpeg,.png,.pdf"
+             multiple="multiple"
+             />
+    </div>
+  </div>
+
+<script cam-script type="text/form-script">
+    debugger;
+
+	var inputList = [];
+	var input = document.getElementById("documentUpload");
+	input.addEventListener("change", function () {
+		for(var i = 0; i < this.files.length; i++) {
+        var myFile = this.files[i];
+        var reader = new FileReader();
+        reader.addEventListener('load', function (e) {
+          var binaryString = e.target.result;
+          var data = btoa(binaryString);
+          inputList.push(data);
+        });
+        reader.readAsBinaryString(myFile);
+    	}
+	});
+
+	var variableManager = camForm.variableManager;
+    camForm.on('submit', function(evt) {
+		var files = $('#documentUpload')[0].files;
+		for(var i = 1; i < files.length; i++) {
+			var varName = 'documentUpload'+i;
+			variableManager.createVariable({
+        		name: varName,
+        		type: 'File',
+       			value: inputList[i],
+     			valueInfo: {
+         			filename: files[i].name,
+					mimetype: files[i].type		 
+				}
+     		});
+		}
+    });
+
+  </script>
+  
+</form>
